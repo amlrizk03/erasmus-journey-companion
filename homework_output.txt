@@ -1,0 +1,10 @@
+Check if number is prime
+17 is prime
+
+First N prime numbers
+The first 10 primes:
+2 3 5 7 11 13 17 19 23 29 
+
+Fibonacci sequence
+First 12 terms:
+0 1 1 2 3 5 8 13 21 34 55 89 
