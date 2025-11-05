@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Exercise Part 1: Backup file script
+# Exercise1
 
 # Get filename from user
 read -p "Enter file name: " filename
 
 # Check if file exists
 if [ ! -f "$filename" ]; then
-    echo "Error: File does not exist!"
+    echo "File does not exist!"
     exit 1
 fi
 
