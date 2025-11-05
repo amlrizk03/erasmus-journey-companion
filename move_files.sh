@@ -45,6 +45,5 @@ else
     echo "File not found: $trashfile"
 fi
 
-echo ""
 echo "Files in trash directory:"
 ls -l trash/
