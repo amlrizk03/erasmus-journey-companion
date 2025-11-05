@@ -1,14 +1,12 @@
 #!/bin/bash
 
-# Exercise Part 2: Move files script
+# Exercise Part 2: 
 
-# Create old directory if it doesn't exist
 if [ ! -d "old" ]; then
     mkdir old
     echo "Created 'old' directory"
 fi
 
-# Create trash directory if it doesn't exist
 if [ ! -d "trash" ]; then
     mkdir trash
     echo "Created 'trash' directory"
