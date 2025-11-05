@@ -2,9 +2,7 @@
 
 # Lab Exercises - All in one script
 
-echo "========================================="
 echo "Exercise 1: Run some commands from PPT"
-echo "========================================="
 pwd
 whoami
 ls
