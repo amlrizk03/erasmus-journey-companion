@@ -52,8 +52,6 @@ while [ $count -lt $n ]; do
     number=$((number + 1))
 done
 
-echo ""
-echo ""
 
 # Application 3: Fibonacci sequence
 echo "Fibonacci sequence"
@@ -70,4 +68,4 @@ for ((i=0; i<n; i++)); do
     b=$next
 done
 
-echo ""
+
