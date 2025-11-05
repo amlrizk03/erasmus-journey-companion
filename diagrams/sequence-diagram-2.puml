@@ -1,0 +1,122 @@
+@startuml Activity Recommendation and Document Deadline Notification
+
+title Sequence Diagram 2: Personalized Activity Recommendations and Document Deadline Alerts
+
+actor Student as student
+participant "Student\nObject" as studentObj
+participant "RecommendationEngine" as engine
+participant "InterestBasedRecommendation" as interestStrategy
+participant "LocationBasedRecommendation" as locationStrategy
+participant "Activity\nList" as activities
+participant "DocumentBuilder" as docBuilder
+participant "Document" as document
+participant "DeadlineNotifier" as notifier
+
+== Getting Recommendations (Strategy Pattern) ==
+student -> engine : new RecommendationEngine(interestStrategy)
+activate engine
+engine -> engine : this.strategy = interestStrategy
+
+student -> engine : getRecommendations(studentObj, allActivities)
+engine -> interestStrategy : recommend(studentObj, allActivities)
+activate interestStrategy
+
+interestStrategy -> studentObj : getProfile()
+activate studentObj
+studentObj --> interestStrategy : return profile
+deactivate studentObj
+
+interestStrategy -> interestStrategy : extract user interests\n[Technology, Culture, Sports]
+
+loop for each activity in allActivities
+    interestStrategy -> activities : getType(), getName()
+    activate activities
+    activities --> interestStrategy : activity details
+    deactivate activities
+    
+    alt activity matches user interests
+        interestStrategy -> interestStrategy : add to recommendations
+    end
+end
+
+interestStrategy --> engine : return filtered activities
+deactivate interestStrategy
+engine --> student : return recommended activities
+
+note right
+  Show activities matching
+  student's interests
+end note
+
+== Switching Strategy (Strategy Pattern) ==
+student -> engine : setStrategy(locationStrategy)
+engine -> engine : this.strategy = locationStrategy
+
+student -> engine : getRecommendations(studentObj, allActivities)
+engine -> locationStrategy : recommend(studentObj, allActivities)
+activate locationStrategy
+
+locationStrategy -> studentObj : getProfile().getLocation()
+activate studentObj
+studentObj --> locationStrategy : return "Bucharest"
+deactivate studentObj
+
+loop for each activity in allActivities
+    locationStrategy -> activities : getLocation()
+    activate activities
+    activities --> locationStrategy : activity location
+    deactivate activities
+    
+    alt location matches user location
+        locationStrategy -> locationStrategy : add to recommendations
+    end
+end
+
+locationStrategy --> engine : return filtered activities
+deactivate locationStrategy
+engine --> student : return location-based recommendations
+
+note right
+  Different algorithm,
+  same interface
+end note
+
+== Document Upload and Deadline Notification (Builder + Observer) ==
+student -> docBuilder : new DocumentBuilder("DOC001", "S001", "Learning_Agreement.pdf")
+activate docBuilder
+student -> docBuilder : category("Academic")
+student -> docBuilder : deadline(LocalDate.now().plusDays(5))
+student -> docBuilder : description("Signed learning agreement")
+student -> docBuilder : build()
+docBuilder -> document : <<create>>
+activate document
+docBuilder --> student : return Document
+deactivate docBuilder
+
+student -> notifier : registerObserver(studentObj)
+activate notifier
+notifier -> notifier : observers.add(studentObj)
+
+student -> notifier : addDocument(document)
+notifier -> notifier : documents.add(document)
+notifier -> notifier : checkDeadlines()
+
+notifier -> document : getDeadline()
+document --> notifier : return deadline date
+
+notifier -> notifier : calculate days until deadline\n(5 days)
+
+alt deadline within 7 days
+    notifier -> notifier : notifyObservers("Deadline in 5 days")
+    notifier -> studentObj : update("Document deadline in 5 days!")
+    activate studentObj
+    studentObj -> studentObj : notifications.add(message)
+    studentObj --> studentObj : print notification
+    deactivate studentObj
+end
+
+deactivate notifier
+deactivate document
+deactivate engine
+
+@enduml

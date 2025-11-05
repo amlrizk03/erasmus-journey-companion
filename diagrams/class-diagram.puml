@@ -1,0 +1,248 @@
+@startuml Erasmus Journey Companion - Class Diagram
+
+' ===== FACTORY METHOD PATTERN =====
+note "FACTORY METHOD PATTERN\nCreates different user types\nwithout exposing creation logic" as FactoryNote
+
+package "User Module (Factory Pattern)" {
+    abstract class User {
+        - userId: String
+        - name: String
+        - email: String
+        - profile: UserProfile
+        - notifications: List<String>
+        + User(userId, name, email)
+        + getUserId(): String
+        + getName(): String
+        + getEmail(): String
+        + getProfile(): UserProfile
+        + setProfile(profile: UserProfile)
+        + {abstract} getRole(): String
+        + update(message: String)
+        + displayInfo()
+    }
+    
+    class Student {
+        - university: String
+        - homeCountry: String
+        + getRole(): String
+        + setUniversity(university: String)
+        + setHomeCountry(country: String)
+    }
+    
+    class Mentor {
+        - expertise: String
+        - assignedStudents: List<String>
+        + getRole(): String
+        + setExpertise(expertise: String)
+        + addAssignedStudent(studentId: String)
+    }
+    
+    class Administrator {
+        - department: String
+        - accessLevel: String
+        + getRole(): String
+        + setDepartment(department: String)
+        + setAccessLevel(level: String)
+    }
+    
+    class UserFactory {
+        + {static} createUser(type: String, userId: String, name: String, email: String): User
+    }
+    
+    User <|-- Student
+    User <|-- Mentor
+    User <|-- Administrator
+    UserFactory ..> User : creates
+}
+
+FactoryNote .. UserFactory
+FactoryNote .. Student
+FactoryNote .. Mentor
+FactoryNote .. Administrator
+
+' ===== BUILDER PATTERN =====
+note "BUILDER PATTERN\nConstructs complex objects\nstep by step" as BuilderNote
+
+package "Profile Module (Builder Pattern)" {
+    class UserProfile {
+        - bio: String
+        - nationality: String
+        - university: String
+        - fieldOfStudy: String
+        - interests: List<String>
+        - location: String
+        - phoneNumber: String
+        - emergencyContact: String
+        + getBio(): String
+        + getNationality(): String
+        + getInterests(): List<String>
+        + toString(): String
+    }
+    
+    class "UserProfile.UserProfileBuilder" as Builder {
+        - bio: String
+        - nationality: String
+        - university: String
+        - fieldOfStudy: String
+        - interests: List<String>
+        - location: String
+        - phoneNumber: String
+        - emergencyContact: String
+        + bio(bio: String): Builder
+        + nationality(nationality: String): Builder
+        + university(university: String): Builder
+        + fieldOfStudy(field: String): Builder
+        + addInterest(interest: String): Builder
+        + location(location: String): Builder
+        + phoneNumber(phone: String): Builder
+        + emergencyContact(contact: String): Builder
+        + build(): UserProfile
+    }
+    
+    UserProfile +-- Builder
+    Builder ..> UserProfile : builds
+}
+
+User --> UserProfile : has
+BuilderNote .. UserProfile
+BuilderNote .. Builder
+
+package "Document Module (Builder Pattern)" {
+    class Document {
+        - documentId: String
+        - userId: String
+        - fileName: String
+        - fileType: String
+        - category: String
+        - uploadDate: LocalDate
+        - deadline: LocalDate
+        - description: String
+        - filePath: String
+        + getFileName(): String
+        + getDeadline(): LocalDate
+        + toString(): String
+    }
+    
+    class "Document.DocumentBuilder" as DocBuilder {
+        - documentId: String
+        - userId: String
+        - fileName: String
+        - fileType: String
+        - category: String
+        - deadline: LocalDate
+        - description: String
+        + DocumentBuilder(id, userId, fileName)
+        + fileType(type: String): DocBuilder
+        + category(category: String): DocBuilder
+        + deadline(date: LocalDate): DocBuilder
+        + description(desc: String): DocBuilder
+        + filePath(path: String): DocBuilder
+        + build(): Document
+    }
+    
+    Document +-- DocBuilder
+    DocBuilder ..> Document : builds
+}
+
+BuilderNote .. Document
+BuilderNote .. DocBuilder
+
+' ===== OBSERVER PATTERN =====
+note "OBSERVER PATTERN\nNotifies subscribers when\nevents or changes occur" as ObserverNote
+
+package "Notification Module (Observer Pattern)" {
+    interface Observer {
+        + update(message: String)
+    }
+    
+    interface Subject {
+        + registerObserver(observer: Observer)
+        + removeObserver(observer: Observer)
+        + notifyObservers(message: String)
+    }
+    
+    class Activity {
+        - activityId: String
+        - name: String
+        - description: String
+        - type: String
+        - location: String
+        - date: String
+        - organizer: String
+        - maxParticipants: int
+        - subscribers: List<Observer>
+        + getName(): String
+        + getType(): String
+        + getLocation(): String
+        + setDescription(desc: String)
+        + setDate(date: String)
+        + registerObserver(observer: Observer)
+        + removeObserver(observer: Observer)
+        + notifyObservers(message: String)
+    }
+    
+    class DeadlineNotifier {
+        - observers: List<Observer>
+        - documents: List<Document>
+        + addDocument(doc: Document)
+        + checkDeadlines()
+        + registerObserver(observer: Observer)
+        + removeObserver(observer: Observer)
+        + notifyObservers(message: String)
+    }
+    
+    Subject <|.. Activity
+    Subject <|.. DeadlineNotifier
+    Observer <|.. User
+}
+
+Activity --> Observer : notifies
+DeadlineNotifier --> Observer : notifies
+DeadlineNotifier --> Document : monitors
+ObserverNote .. Subject
+ObserverNote .. Observer
+ObserverNote .. Activity
+ObserverNote .. DeadlineNotifier
+
+' ===== STRATEGY PATTERN =====
+note "STRATEGY PATTERN\nSwitches between different\nrecommendation algorithms" as StrategyNote
+
+package "Recommendation Module (Strategy Pattern)" {
+    interface RecommendationStrategy {
+        + recommend(user: User, activities: List<Activity>): List<Activity>
+    }
+    
+    class InterestBasedRecommendation {
+        + recommend(user: User, activities: List<Activity>): List<Activity>
+    }
+    
+    class LocationBasedRecommendation {
+        + recommend(user: User, activities: List<Activity>): List<Activity>
+    }
+    
+    class UniversityBasedRecommendation {
+        + recommend(user: User, activities: List<Activity>): List<Activity>
+    }
+    
+    class RecommendationEngine {
+        - strategy: RecommendationStrategy
+        + RecommendationEngine(strategy: RecommendationStrategy)
+        + setStrategy(strategy: RecommendationStrategy)
+        + getRecommendations(user: User, activities: List<Activity>): List<Activity>
+    }
+    
+    RecommendationStrategy <|.. InterestBasedRecommendation
+    RecommendationStrategy <|.. LocationBasedRecommendation
+    RecommendationStrategy <|.. UniversityBasedRecommendation
+    RecommendationEngine --> RecommendationStrategy : uses
+}
+
+RecommendationEngine ..> User : analyzes
+RecommendationEngine ..> Activity : recommends
+StrategyNote .. RecommendationStrategy
+StrategyNote .. RecommendationEngine
+StrategyNote .. InterestBasedRecommendation
+StrategyNote .. LocationBasedRecommendation
+StrategyNote .. UniversityBasedRecommendation
+
+@enduml

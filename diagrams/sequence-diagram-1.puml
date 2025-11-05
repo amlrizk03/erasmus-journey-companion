@@ -1,0 +1,63 @@
+@startuml User Registration and Activity Subscription
+
+title Sequence Diagram 1: User Registration, Profile Building, and Event Subscription
+
+actor Student as student
+participant "UserFactory" as factory
+participant "Student" as studentObj
+participant "UserProfileBuilder" as builder
+participant "UserProfile" as profile
+participant "Activity" as activity
+
+== User Creation (Factory Pattern) ==
+student -> factory : createUser("STUDENT", "S001", "Maria", "maria@email.com")
+activate factory
+factory -> studentObj : <<create>>
+activate studentObj
+factory --> student : return Student object
+deactivate factory
+
+== Profile Building (Builder Pattern) ==
+student -> builder : new UserProfileBuilder()
+activate builder
+student -> builder : bio("CS student from Spain")
+student -> builder : nationality("Spanish")
+student -> builder : university("Politehnica Bucharest")
+student -> builder : fieldOfStudy("Computer Science")
+student -> builder : addInterest("Technology")
+student -> builder : addInterest("Culture")
+student -> builder : location("Bucharest")
+student -> builder : build()
+builder -> profile : <<create>>
+activate profile
+builder --> student : return UserProfile
+deactivate builder
+
+student -> studentObj : setProfile(profile)
+studentObj -> studentObj : this.profile = profile
+
+== Activity Subscription (Observer Pattern) ==
+student -> activity : registerObserver(studentObj)
+activate activity
+activity -> activity : subscribers.add(studentObj)
+activity --> student : subscription confirmed
+note right
+  Student is now registered
+  as an observer and will
+  receive notifications
+end note
+
+== Activity Update Notification ==
+activity -> activity : setDate("2025-11-16")
+activity -> activity : notifyObservers("Activity date changed")
+loop for each subscriber
+    activity -> studentObj : update("Activity date changed to 2025-11-16")
+    studentObj -> studentObj : notifications.add(message)
+    studentObj --> studentObj : print notification
+end
+
+deactivate activity
+deactivate studentObj
+deactivate profile
+
+@enduml

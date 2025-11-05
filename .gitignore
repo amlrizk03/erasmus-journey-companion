@@ -1,0 +1,68 @@
+# Java compiled files
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Build directories
+target/
+build/
+out/
+bin/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Package files
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+dependency-reduced-pom.xml
+
+# Gradle
+.gradle/
+gradle-app.setting
+
+# Old project files
+old/
+trash/
+backup/
+*.bak.*
+
+# Other
+applications.sh
+applications_output.txt
+backup_file.sh
+file1.txt
+file1.txt.bak.*
+homework_output.sh
+homework_output.txt
+homework_submission.txt
+lab_exercises.sh
+main.sh
+move_files.sh
+my_commands.sh
+run_and_save.sh
+testfile.txt
+testfile.txt.bak.*
+source_dir/
+destination_dir/
+folder1/
+folder2/
