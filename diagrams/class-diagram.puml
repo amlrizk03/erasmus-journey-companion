@@ -24,25 +24,34 @@ package "User Module (Factory Pattern)" {
     class Student {
         - university: String
         - homeCountry: String
+        + Student(userId: String, name: String, email: String)
         + getRole(): String
         + setUniversity(university: String)
+        + getUniversity(): String
         + setHomeCountry(country: String)
+        + getHomeCountry(): String
     }
     
     class Mentor {
         - expertise: String
         - assignedStudents: List<String>
+        + Mentor(userId: String, name: String, email: String)
         + getRole(): String
         + setExpertise(expertise: String)
+        + getExpertise(): String
         + addAssignedStudent(studentId: String)
+        + getAssignedStudents(): List<String>
     }
     
     class Administrator {
         - department: String
         - accessLevel: String
+        + Administrator(userId: String, name: String, email: String)
         + getRole(): String
         + setDepartment(department: String)
+        + getDepartment(): String
         + setAccessLevel(level: String)
+        + getAccessLevel(): String
     }
     
     class UserFactory {
@@ -184,6 +193,7 @@ package "Notification Module (Observer Pattern)" {
     class DeadlineNotifier {
         - observers: List<Observer>
         - documents: List<Document>
+        + DeadlineNotifier()
         + addDocument(doc: Document)
         + checkDeadlines()
         + registerObserver(observer: Observer)
