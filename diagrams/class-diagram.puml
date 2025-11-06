@@ -3,13 +3,14 @@
 ' ===== FACTORY METHOD PATTERN =====
 note "FACTORY METHOD PATTERN\nCreates different user types\nwithout exposing creation logic" as FactoryNote
 
-package "User Module (Factory Pattern)" {
+package "User Module " {
     abstract class User {
         - userId: String
         - name: String
         - email: String
         - profile: UserProfile
         - notifications: List<String>
+        - registrationDate: LocalDate
         + User(userId, name, email)
         + getUserId(): String
         + getName(): String
@@ -72,7 +73,7 @@ FactoryNote .. Administrator
 ' ===== BUILDER PATTERN =====
 note "BUILDER PATTERN\nConstructs complex objects\nstep by step" as BuilderNote
 
-package "Profile Module (Builder Pattern)" {
+package "Profile Module " {
     class UserProfile {
         - bio: String
         - nationality: String
@@ -116,7 +117,7 @@ User --> UserProfile : has
 BuilderNote .. UserProfile
 BuilderNote .. Builder
 
-package "Document Module (Builder Pattern)" {
+package "Document Module " {
     class Document {
         - documentId: String
         - userId: String
@@ -157,9 +158,9 @@ BuilderNote .. Document
 BuilderNote .. DocBuilder
 
 ' ===== OBSERVER PATTERN =====
-note "OBSERVER PATTERN\nNotifies subscribers when\nevents or changes occur" as ObserverNote
+note "OBSERVER PATTERN\nNotifies subscribers when\nevents or changes occur" as ObserverNote #lightyellow
 
-package "Notification Module (Observer Pattern)" {
+package "Notification Module " {
     interface Observer {
         + update(message: String)
     }
@@ -217,7 +218,7 @@ ObserverNote .. DeadlineNotifier
 ' ===== STRATEGY PATTERN =====
 note "STRATEGY PATTERN\nSwitches between different\nrecommendation algorithms" as StrategyNote
 
-package "Recommendation Module (Strategy Pattern)" {
+package "Recommendation Module " {
     interface RecommendationStrategy {
         + recommend(user: User, activities: List<Activity>): List<Activity>
     }

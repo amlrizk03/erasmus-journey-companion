@@ -2,7 +2,7 @@
 
 title Sequence Diagram 1: User Registration, Profile Building, and Event Subscription
 
-actor Student as student
+actor "Aml Rizk\n(Student)" as student
 participant "UserFactory" as factory
 participant "Student" as studentObj
 participant "UserProfileBuilder" as builder
@@ -10,7 +10,7 @@ participant "UserProfile" as profile
 participant "Activity" as activity
 
 == User Creation (Factory Pattern) ==
-student -> factory : createUser("STUDENT", "S001", "Maria", "maria@email.com")
+student -> factory : createUser("STUDENT", "1234", "Aml Rizk", "amlrizk03@gmail.com")
 activate factory
 factory -> studentObj : <<create>>
 activate studentObj
@@ -20,12 +20,13 @@ deactivate factory
 == Profile Building (Builder Pattern) ==
 student -> builder : new UserProfileBuilder()
 activate builder
-student -> builder : bio("CS student from Spain")
-student -> builder : nationality("Spanish")
+student -> builder : bio("Software Engineering student from Egypt")
+student -> builder : nationality("Egyptian")
 student -> builder : university("Politehnica Bucharest")
-student -> builder : fieldOfStudy("Computer Science")
+student -> builder : fieldOfStudy("Software Engineering")
 student -> builder : addInterest("Technology")
 student -> builder : addInterest("Culture")
+student -> builder : addInterest("Travelling")
 student -> builder : location("Bucharest")
 student -> builder : build()
 builder -> profile : <<create>>
@@ -41,6 +42,7 @@ student -> activity : registerObserver(studentObj)
 activate activity
 activity -> activity : subscribers.add(studentObj)
 activity --> student : subscription confirmed
+
 note right
   Student is now registered
   as an observer and will
