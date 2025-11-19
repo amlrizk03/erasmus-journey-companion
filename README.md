@@ -1,8 +1,4 @@
 # Milestone 3: Software Architecture Evaluation
-**Project:** Erasmus Journey Companion  
-**Student:** Aml Mohamed Rizk  
-**Course:** Software Design Techniques
-
 ---
 
 ## 1. Introduction
