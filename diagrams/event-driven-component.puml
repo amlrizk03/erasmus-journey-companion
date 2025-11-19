@@ -1,0 +1,66 @@
+@startuml Event-Driven Architecture - Component Diagram
+
+skinparam componentStyle rectangle
+skinparam backgroundColor #FFFFFF
+
+package "Event Producers" {
+    [User Management] as UserProd
+    [Activity Management] as ActivityProd
+    [Document Management] as DocProd
+}
+
+package "Event Broker" {
+    queue "user.events" as UserEvents
+    queue "activity.events" as ActivityEvents
+    queue "document.events" as DocEvents
+}
+
+package "Event Consumers" {
+    [Notification Handler] as NotifCons
+    [Recommendation Engine] as RecommendCons
+    [Search Indexer] as SearchCons
+}
+
+package "Data Storage" {
+    database "Event Store" as EventStore
+    database "User Read Model" as UserRead
+    database "Activity Read Model" as ActivityRead
+}
+
+UserProd --> UserEvents : Publish
+ActivityProd --> ActivityEvents : Publish
+DocProd --> DocEvents : Publish
+
+UserEvents --> NotifCons : Subscribe
+ActivityEvents --> NotifCons : Subscribe
+DocEvents --> NotifCons : Subscribe
+
+UserEvents --> RecommendCons : Subscribe
+ActivityEvents --> RecommendCons : Subscribe
+
+ActivityEvents --> SearchCons : Subscribe
+
+UserProd --> EventStore : Store
+ActivityProd --> EventStore : Store
+DocProd --> EventStore : Store
+
+RecommendCons --> UserRead : Update
+RecommendCons --> ActivityRead : Update
+SearchCons --> ActivityRead : Update
+
+note right of "Event Broker"
+    Central message hub
+    distributes events
+end note
+
+note bottom of EventStore
+    Complete event history
+    for audit trail
+end note
+
+note left of "Event Consumers"
+    Process events
+    asynchronously
+end note
+
+@enduml

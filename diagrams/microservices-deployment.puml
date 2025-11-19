@@ -1,0 +1,68 @@
+@startuml Microservices Architecture - Deployment Diagram
+
+skinparam nodeStyle rectangle
+skinparam backgroundColor #FFFFFF
+
+actor User
+
+node "API Gateway" as Gateway
+
+node "User Service" as US {
+    component [user-service]
+    database "users-db"
+}
+
+node "Activity Service" as AS {
+    component [activity-service]
+    database "activities-db"
+}
+
+node "Recommendation Service" as RS {
+    component [recommendation-service]
+    database "cache"
+}
+
+node "Notification Service" as NS {
+    component [notification-service]
+    database "notifications-db"
+}
+
+node "Document Service" as DS {
+    component [document-service]
+    database "documents-db"
+}
+
+node "Message Broker" as Broker {
+    queue "Kafka/RabbitMQ"
+}
+
+cloud "Object Storage" as Storage
+
+User --> Gateway : HTTPS
+
+Gateway --> US : REST
+Gateway --> AS : REST
+Gateway --> RS : REST
+Gateway --> NS : REST
+Gateway --> DS : REST
+
+AS --> Broker : Events
+DS --> Broker : Events
+Broker --> NS : Events
+
+DS --> Storage : Files
+
+note right of Gateway
+    Routes to correct service
+end note
+
+note bottom of Broker
+    Handles async messages
+end note
+
+note as N1
+    Each service deployed
+    independently
+end note
+
+@enduml

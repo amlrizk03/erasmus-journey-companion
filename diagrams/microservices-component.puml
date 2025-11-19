@@ -1,0 +1,70 @@
+@startuml
+title Microservices Architecture - Component Diagram
+
+skinparam componentStyle rectangle
+skinparam backgroundColor #FFFFFF
+
+actor User
+
+[API Gateway] as Gateway
+
+package "User Service" {
+    [User Logic] as UserLogic
+    database "Users DB" as UserDB
+}
+
+package "Activity Service" {
+    [Activity Logic] as ActivityLogic
+    database "Activities DB" as ActivityDB
+}
+
+package "Recommendation Service" {
+    [Recommendation Logic] as RecLogic
+    database "Cache" as Cache
+}
+
+package "Notification Service" {
+    [Notification Logic] as NotifLogic
+    database "Notifications DB" as NotifDB
+}
+
+package "Document Service" {
+    [Document Logic] as DocLogic
+    database "Documents DB" as DocDB
+}
+
+queue "Message Broker" as Broker
+
+User --> Gateway : HTTP Request
+
+Gateway --> UserLogic : REST
+Gateway --> ActivityLogic : REST
+Gateway --> RecLogic : REST
+Gateway --> NotifLogic : REST
+Gateway --> DocLogic : REST
+
+UserLogic --> UserDB
+ActivityLogic --> ActivityDB
+DocLogic --> DocDB
+NotifLogic --> NotifDB
+
+ActivityLogic --> Broker : Publish Event
+DocLogic --> Broker : Publish Event
+
+Broker --> NotifLogic : Deliver Event
+Broker --> RecLogic : Deliver Event
+
+RecLogic ..> UserLogic : Fetch User Data
+RecLogic ..> ActivityLogic : Fetch Activities
+
+note top of Gateway
+    Single entry point
+    for all clients
+end note
+
+note right of Broker
+    Asynchronous communication
+    using events
+end note
+
+@enduml

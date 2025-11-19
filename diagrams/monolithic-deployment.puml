@@ -1,0 +1,49 @@
+@startuml Monolithic Architecture - Deployment Diagram
+
+skinparam nodeStyle rectangle
+skinparam backgroundColor #FFFFFF
+
+actor User
+
+node "Load Balancer" as LB
+
+node "App Server 1" {
+    component [Application\n(All Modules)] as App1
+}
+
+node "App Server 2" {
+    component [Application\n(All Modules)] as App2
+}
+
+node "Database Server" {
+    database "PostgreSQL" as DB
+}
+
+cloud "File Storage" as Files
+
+User --> LB : HTTPS
+LB --> App1
+LB --> App2
+
+App1 --> DB : Read/Write
+App2 --> DB : Read/Write
+
+App1 --> Files
+App2 --> Files
+
+note right of LB
+    Distribute traffic
+    to multiple servers
+end note
+
+note bottom of DB
+    Shared database
+    ensures consistency
+end note
+
+note as N1
+    Scale by adding
+    more app servers
+end note
+
+@enduml

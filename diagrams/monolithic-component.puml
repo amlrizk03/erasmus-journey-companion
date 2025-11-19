@@ -1,0 +1,57 @@
+@startuml Monolithic Architecture - Component Diagram
+
+skinparam componentStyle rectangle
+skinparam backgroundColor #FFFFFF
+
+package "Single Application" {
+    
+    [Web Interface] as UI
+    
+    package "Core Modules" {
+        [User Module] as User
+        [Activity Module] as Activity
+        [Recommendation Module] as Recommend
+        [Notification Module] as Notif
+        [Document Module] as Doc
+    }
+    
+    [Data Access Layer] as DAL
+}
+
+database "Single Database" as DB
+
+UI --> User
+UI --> Activity
+UI --> Recommend
+UI --> Notif
+UI --> Doc
+
+User --> DAL
+Activity --> DAL
+Recommend --> DAL
+Notif --> DAL
+Doc --> DAL
+
+DAL --> DB
+
+User -[hidden]right-> Activity
+Activity -[hidden]right-> Recommend
+Recommend -[hidden]right-> Notif
+Notif -[hidden]right-> Doc
+
+note top of "Single Application"
+    All modules run together
+    in one application
+end note
+
+note right of DB
+    One shared database
+    for all modules
+end note
+
+note bottom of DAL
+    Direct method calls
+    between modules
+end note
+
+@enduml

@@ -1,0 +1,64 @@
+@startuml Event-Driven Architecture - Deployment Diagram
+
+skinparam nodeStyle rectangle
+skinparam backgroundColor #FFFFFF
+
+actor User
+
+node "Web Application" as WebApp {
+    component [API Server]
+}
+
+node "Event Producers" as Producers {
+    component [User Producer]
+    component [Activity Producer]
+    component [Document Producer]
+}
+
+node "Kafka Cluster" as Kafka {
+    queue "Message Topics"
+}
+
+node "Event Consumers" as Consumers {
+    component [Notification Consumer]
+    component [Recommendation Consumer]
+    component [Search Indexer]
+}
+
+node "Data Layer" as Data {
+    database "Event Store"
+    database "Read Models"
+}
+
+cloud "External Services" as External {
+    component [Email Service]
+}
+
+User --> WebApp : HTTPS
+
+WebApp --> Producers : Commands
+
+Producers --> Kafka : Publish Events
+Kafka --> Consumers : Subscribe Events
+
+Producers --> Data : Store Events
+Consumers --> Data : Update Models
+
+Consumers --> External : Send Notifications
+
+note right of Kafka
+    Message broker
+    handles async events
+end note
+
+note bottom of Data
+    Event Store + Read Models
+    for CQRS pattern
+end note
+
+note as N1
+    Events flow one way
+    from producers to consumers
+end note
+
+@enduml
