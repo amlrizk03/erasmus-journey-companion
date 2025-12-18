@@ -1,86 +1,116 @@
-# Milestone 5 - Message Queue & CI/CD Pipeline
+# Milestone 5 – Message Queue Integration & CI/CD
 
-This milestone extends the microservices system with:
-- RabbitMQ for asynchronous communication
-- CI/CD pipeline using GitHub Actions
-
----
-
-## System Architecture
-
-The system consists of three Spring Boot microservices:
-
-### 1. User Service
-- Port: 8081
-- Responsibility: Manage users
-
-Endpoints:
-- POST /users
-- GET /users
-- GET /users/{id}
-
----
-
-### 2. Activity Service
-- Port: 8082
-- Responsibility:
-    - Manage activities
-    - Consume messages from RabbitMQ
-
-Endpoints:
-- POST /activities
-- GET /activities
-- GET /activities/{id}
-
----
-
-### 3. Participation Service
-- Port: 8083
-- Responsibility:
-    - Manage user participation in activities
-    - Publish events to RabbitMQ
-
-Endpoints:
-- POST /participations/join
-- GET /participations/byUser/{userId}
-- GET /participations/byActivity/{activityId}
+This milestone extends the existing microservices system by adding:
+- **RabbitMQ** for asynchronous communication between services
+- A **CI/CD pipeline** using GitHub Actions to automatically build, test, and deploy the system
 
 ---
 
 ## Message Queue Integration (RabbitMQ)
 
-### Queue Used
-- Queue name: `participation.joined.queue`
-
-### How it Works
-1. When a user joins an activity, the participation-service:
-    - Saves participation data
-    - Publishes a `ParticipationJoinedEvent` to RabbitMQ
-2. The activity-service listens to this queue and consumes the event asynchronously.
-
-### Benefits
-- Loose coupling between services
-- Better fault tolerance
-- Improved scalability
-- No direct REST dependency between services
-
-### RabbitMQ Management UI
-- URL: http://localhost:15672
-- Username: guest
-- Password: guest
-
-You can verify message flow from:
-Queues and Streams → `participation.joined.queue`
+### Overview
+RabbitMQ is used to enable **asynchronous, event-driven communication** between microservices.
+This reduces tight coupling and improves scalability and fault tolerance.
 
 ---
 
-## Running the System with Docker
+### Queue Configuration
+- **Queue Name:** `participation.joined.queue`
+
+---
+
+### How It Works
+1. When a user joins an activity, the **participation-service**:
+    - Saves participation data in its database
+    - Publishes a `ParticipationJoinedEvent` to RabbitMQ
+2. The **activity-service** listens to the queue and consumes the event asynchronously.
+3. The activity service processes the event without making any direct REST calls to the participation service.
+
+---
+
+### Services Involved
+
+#### Participation Service (Producer)
+- Publishes messages to RabbitMQ when a user joins an activity
+- Responsible for emitting domain events
+
+#### Activity Service (Consumer)
+- Listens to RabbitMQ queue
+- Consumes and processes `ParticipationJoinedEvent`
+
+---
+
+### Benefits of Using RabbitMQ
+- Loose coupling between services
+- Improved fault tolerance (services can work independently)
+- Better scalability
+- Non-blocking, asynchronous communication
+- Reduced dependency on synchronous REST calls
+
+---
+
+### RabbitMQ Management UI
+You can monitor the message queue using RabbitMQ’s web interface:
+
+- **URL:** http://localhost:15672
+- **Username:** `guest`
+- **Password:** `guest`
+
+To verify message flow:
+Queues and Streams → participation.joined.queue
+
+
+---
+
+## CI/CD Pipeline (GitHub Actions)
+
+### Overview
+A CI/CD pipeline is implemented using **GitHub Actions** to automate the build, test, and deployment process.
+
+---
+
+### Pipeline Configuration
+The pipeline is defined in:
+.github/workflows/ci.yml
+
+
+---
+
+### Pipeline Workflow
+On every push to the **Milestone 5 branch**:
+
+1. The repository is checked out
+2. Java 17 is set up
+3. All microservices are built using Maven
+4. Unit tests are executed
+5. Docker images are built for all services
+6. The system is deployed using Docker Compose
+
+---
+
+### How to Observe the Pipeline
+1. Open the GitHub repository
+2. Navigate to the **Actions** tab
+3. Select the workflow:
+   **Milestone 5: add CI/CD pipeline (GitHub Actions)**
+4. Review logs for build, test, and Docker steps
+
+---
+
+### Benefits of CI/CD
+- Automated verification of code changes
+- Early detection of build or integration issues
+- Consistent and repeatable deployment process
+- Improved reliability of the microservices system
+
+---
+
+## Running the System Locally
 
 ### Prerequisites
 - Docker Desktop installed and running
 
-### Start all services
-From the project root directory (where docker-compose.yml exists):
-
+### Start the system
+From the project root directory:
 ```bash
 docker compose up --build
