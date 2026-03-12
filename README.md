@@ -1,131 +1,76 @@
-# Erasmus Journey Companion
+# Milestone 4 - Microservices Architecture (Spring Boot + Docker + Postman)
 
-**Student:** Aml Mohamed Rizk  
-**Course:** Software Design Techniques  
+This project implements a simple microservices-based system using Spring Boot.
+It demonstrates service separation, inter-service communication, Docker usage,
+and API testing with Postman.
 
----
+## Services Overview
 
-## Project Description
+The system consists of three independent microservices:
 
-The Erasmus Journey Companion is a digital assistant designed to enhance the academic and social experience of Erasmus students studying abroad.  
-It integrates academic management, event organization, and communication tools into a single environment, helping students stay informed, connected, and organized.
+### 1) User Service
+- Port: **8081**
+- Responsibility: Manage users
 
-### System Overview
-Through this system, users can:
-- Create and update detailed personal and academic profiles.  
-- Discover and join university or cultural activities.  
-- Receive notifications about deadlines, events, or announcements.  
-- Obtain personalized recommendations based on their interests, location, or university.  
-- Connect with mentors, coordinators, and other Erasmus participants.  
-
-The project demonstrates the application of object-oriented design principles and software design patterns to build a modular, extensible, and maintainable system architecture.
+Endpoints:
+- `POST /users`
+- `GET /users`
+- `GET /users/{id}`
 
 ---
 
-## System Objectives and Core Functionalities
+### 2) Activity Service
+- Port: **8082**
+- Responsibility: Manage activities
 
-### 1. User Management
-- Register and authenticate users.  
-- Support multiple user roles: Student, Mentor, and Administrator.  
-- Allow users to build and manage detailed personal and academic profiles.  
-
-### 2. Activity Management
-- Enable mentors and administrators to create and manage activities or events.  
-- Allow students to view, register for, and subscribe to events.  
-- Provide updates when activities are modified or new ones are published.  
-
-### 3. Recommendation System
-- Offer personalized recommendations for events or connections.  
-- Use flexible algorithms based on user interests, university, or location.  
-
-### 4. Notification System
-- Notify users automatically when relevant updates occur.  
-
-### 5. Document Management and Deadline Tracker
-- Allow students to upload, categorize, and store essential Erasmus-related documents such as learning agreements, housing forms, or identification copies.  
-- Set reminders for important administrative or academic deadlines.  
-- Integrate with the Notification System to send alerts prior to approaching deadlines.  
+Endpoints:
+- `POST /activities`
+- `GET /activities`
+- `GET /activities/{id}`
 
 ---
 
-## System Modules
-| Module | Description | Key Design Patterns |
-|:--|:--|:--|
-| User Module | Manages user creation, authentication, and profile building. | Factory, Builder |
-| Activity Module | Handles creation and tracking of events and subscriptions. | Observer |
-| Recommendation Module | Generates personalized recommendations. | Strategy |
-| Notification Module | Sends notifications to users based on their subscriptions or deadlines. | Observer |
-| Document Module | Manages document uploads and deadline reminders. | Builder, Observer |
-| Core System | Coordinates communication between all modules. | — |
+### 3) Participation Service
+- Port: **8083**
+- Responsibility: Manage user participation in activities
+- Communicates with:
+    - user-service
+    - activity-service
+
+Endpoints:
+- `POST /participations/join`
+- `GET /participations/byUser/{userId}`
+- `GET /participations/byActivity/{activityId}`
 
 ---
 
-## Design Patterns and Justifications
+## Inter-Service Communication
 
-### 1. Factory Method Pattern
-**Used for:** Creating different user types such as Student, Mentor, and Administrator.  
+The participation-service communicates with other services using REST APIs.
+Inside Docker, services communicate using **service names** instead of localhost:
 
-**Problem Solved:**  
-Without a factory, user creation would require repetitive conditional logic and manual configuration for each role.  
+- `http://user-service:8081`
+- `http://activity-service:8082`
 
-**Advantages:**  
-- Centralizes object creation logic.  
-- Simplifies adding new user roles.  
-- Improves maintainability and readability of code.  
-
-**Compared to simpler alternatives:**  
-Using direct constructors or conditional blocks would tightly couple user creation with business logic.  
-The Factory Method isolates that responsibility, making the code cleaner and easier to extend.
+This configuration is defined in:
+`participation-service/src/main/resources/application.properties`
 
 ---
 
-### 2. Builder Pattern
-**Used for:** Constructing complex user profiles and managing document metadata.  
+## Database
 
-**Problem Solved:**  
-Profiles and documents contain numerous optional attributes such as nationality, university, file type, and upload date.  
-A traditional constructor would be inflexible and difficult to maintain.  
-
-**Advantages:**  
-- Builds objects in a clear, step-by-step manner.  
-- Separates object construction from representation.  
-- Enhances flexibility and scalability when new fields are added.  
-
-**Compared to simpler alternatives:**  
-Using multiple constructors or setter methods would create confusion and increase errors.  
-The Builder Pattern ensures consistency and clarity when constructing complex objects.
+Each microservice uses an **H2 in-memory database**.
+Data is reset whenever the services are restarted.
 
 ---
 
-### 3. Strategy Pattern
-**Used for:** Implementing different recommendation algorithms.  
+## Running the System with Docker
 
-**Problem Solved:**  
-Different students prefer different recommendation criteria, such as by interest, location, or university.  
-Hardcoding all algorithms in a single class would make the system rigid and difficult to extend.  
+### Prerequisites
+- Docker Desktop installed and running
 
-**Advantages:**  
-- Enables switching between algorithms dynamically at runtime.  
-- Promotes the Open/Closed Principle.  
-- Simplifies testing and allows future expansion with minimal changes.  
+### Start all services
+From the root directory (the folder that contains `docker-compose.yml`):
 
-**Compared to simpler alternatives:**  
-Implementing all algorithms in one class would violate modularity and make maintenance harder.  
-The Strategy Pattern isolates each algorithm into its own class, improving flexibility and scalability.
-
----
-
-### 4. Observer Pattern
-**Used for:** Handling notifications related to events and document deadlines.  
-
-**Problem Solved:**  
-Students should automatically receive updates when new activities are added or when deadlines approach, without manually checking the system.  
-
-**Advantages:**  
-- Enables asynchronous, event-driven communication.  
-- Decouples the subject (event or deadline) from the observers (students or mentors).  
-- Allows new notification types to be added without modifying existing classes.  
-
-**Compared to simpler alternatives:**  
-Using manual polling or tightly coupled update logic would lead to redundant code.  
-The Observer Pattern automates event propagation and keeps modules independent.
+```bash
+docker compose up --build
